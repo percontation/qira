@@ -169,10 +169,11 @@ void Trace::process() {
     entry_count = entries_done_ + 1000000;
   }
 
-  while (entries_done_ != entry_count) {
+  for (; entries_done_ != entry_count; entries_done_++) {
     // no need to lock this here, because this is the only thread that changes it
     const struct change *c = &backing_[entries_done_];
     char type = get_type_from_flags(c->flags);
+    if (type == '?') continue;
 
     RWLOCK_WRLOCK(db_lock_);
     // clnum_to_entry_number_, instruction_pages_
@@ -231,8 +232,6 @@ void Trace::process() {
     if (min_clnum_ == INVALID_CLNUM || c->clnum < min_clnum_) {
       min_clnum_ = c->clnum;
     }
-    
-    entries_done_++;
   }
 
 #ifndef _WIN32

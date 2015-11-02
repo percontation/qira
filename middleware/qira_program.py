@@ -469,7 +469,7 @@ class Trace:
 
       try:
         if fn in img_map:
-          off = max(i for i in img_map[fn].iter_keys() if i <= offset)
+          off = max(i for i in img_map[fn].iterkeys() if i <= offset)
           with open(img_map[fn][off]) as f:
             f.seek(offset-off)
             dat = f.read(se-ss)

@@ -36,7 +36,7 @@ ifeq ($(TARGET_OS),mac)
 runls: all
 	cp -f /bin/ls /tmp/ls
 	codesign -fs- /tmp/ls
-	$(PIN_ROOT)/pin -t $(QIRAPINTOOL) -- /tmp/ls -l
+	$(PIN_ROOT)/pin -t $(QIRAPINTOOL) -standalone 1 -- /tmp/ls -l
 else
 ifeq ($(TARGET_OS),windows)
 runls: all

@@ -447,11 +447,13 @@ public:
 		// I think this is only required for the current tid's data structure.
 	}
 	void fork_after_parent(THREADID tid) {
+		// Bump the changelist number to line up better with the child,
+		// which increments its changelist number in thread_start().
+		claim_changelist_number();
 		PIN_ReleaseLock(&lock);
 	}
 	void fork_after_child(THREADID tid, int new_pid) {
 		init(new_pid);
-		changelist_number -= 1; // hax
 		thread_start(tid);
 		PIN_ReleaseLock(&lock);
 	}
@@ -485,6 +487,10 @@ public:
 
 static Process_State process_state;
 
+// FIXME: Somehow, invalid changes (no IS_VALID bit) are getting in the
+// middle of the changelist. This is super wierd, since this should be
+// sequentially writing IS_VALID changes (it's the only thing that incs
+// change_count). Memory corruption???
 static inline void add_change(THREADID tid, uint64_t addr, uint64_t data, uint32_t flags) {
 	Thread_State *state = Thread_State::get(tid);
 	struct logstate *log = state->logstate();
